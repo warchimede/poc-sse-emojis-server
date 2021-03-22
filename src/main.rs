@@ -20,9 +20,12 @@ async fn main() -> Result<(), std::io::Error> {
 }
 
 async fn emojis(request: Request<State>, sender: sse::Sender) -> Result<(), tide::Error> {
+    let mut count: i64 = 0;
     let mut channel = request.state().channel.clone();
     while let Some(emoji) = channel.next().await {
-        sender.send("emoji", emoji, None).await?;
+        let id = format!("{}", count);
+        sender.send("emoji", emoji, Some(&id)).await?;
+        count += 1;
     }
     Ok(())
 }
